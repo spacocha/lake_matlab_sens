@@ -1,88 +1,84 @@
 #!/usr/bin/env python
 
-import numpy as np, re
+import numpy as np, re, csv, itertools
 
-base_fn = 'run.m'
-template_ext = '.template'
+command_mask = 'matlab -nojvm -r run({}); exit;'
 
-script_fn_base = 'run_'
-script_ext = '.m'
+n_submits = 5
 
-command_base = 'matlab -nojvm -r run_'
-
-n_submits = 3
-submit_fn_base = 'submit_'
-submit_ext = '.sh'
+submit_fn_mask = 'submit_{0}.sh'
 
 param_fn_base = 'params_'
 param_ext = '.txt'
 
-params = {
-    '__NITROGEN_RATIO__' : 0.30,
-    '__CARBON_RATIO__' : 1.0,
-    '__FIXED_OXYGEN_LEVEL__' : 75.0,
-    '__FIXED_OXYGEN_DIFFUSION__' : 1e4,
-    '__FIXED_CO2_LEVEL__' : 600.0,
-    '__T_MAX__' : 25.0,
-    '__FE_PRECIPITATION__' : 0.1,
-}
+# list of parameters in the same order as in the matlab definition
+# the last matlab parameter must be the output file
+base_params = [
+    ['__NITROGEN_RATIO__', 0.30],
+    ['__CARBON_RATIO__', 1.0],
+    ['__FIXED_OXYGEN_LEVEL__', 75.0],
+    ['__FIXED_OXYGEN_DIFFUSION__', 1e4],
+    ['__FIXED_CO2_LEVEL__', 600.0],
+    ['__T_MAX__', 25.0],
+    ['__FE_PRECIPITATION__', 0.1],
+]
 
-func_mask = '__FUNCTION_NAME__'
-func_base = 'run_'
-
-out_fn_mask = '__OUT__'
+out_fn_mask = '"rates_{}.csv"'
 out_fn_base = 'rates_'
 out_fn_ext = '.csv'
 
-multipliers = np.linspace(0.99, 1.01, 3)
+multipliers = np.linspace(0.99, 1.01, 5)
 
-def write_dict(fn, d):
-    with open(fn ,'w') as f:
-        f.write("\n".join(["{0}\t{1}".format(k, v) for k, v in d.items()]))
+# get a list of just the parameters
+# add numbers to the base params
+params = [x[1] for x in base_params]
+base_params = [[i] + x for i, x in enumerate(base_params)]
 
 # save the base params
-write_dict('base_params.txt', params)
+def write_rows(fn, rows):
+    with open(fn, 'w') as f:
+        w = csv.writer(f)
+        w.writerows(rows)
 
-# read in the template file
-with open(base_fn + template_ext, 'r') as f:
-    base_script = f.read()
+write_rows('base_params.txt', base_params)
+
+# prepare the command list
+commands = {}
+command_cycler = itertools.cycle(range(n_submits))
+for i in range(n_submits):
+    commands[i] = []
 
 # modulate each of the parameters in turn
-param_map = {}
-for param_i, (param, base_val) in enumerate(params.items()):
-    param_map[param_i] = param
-    val_i = 0
+for param_i, base_val in enumerate(params):
 
     # when modulating this parameter, multiply by some multiplier
-    val_map = {}
+    val_list = []
     for val_i, multiplier in enumerate(multipliers):
-        val = base_val * multiplier
-        val_map[val_i] = val
-        params[param] = val
+        these_params = list(params)
+        this_val = params[param_i] * multiplier
+        these_params[param_i] = this_val
 
-        script_i = "{0}_{1}".format(param_i, val_i)
+        val_list.append([val_i, this_val])
 
-        # go through each pair of params and values, replacing the param placeholder
-        # with the value for this loop
-        script = base_script
-        for p, v in params.items():
-            script = re.sub(p, str(v), script)
+        run_id = "{0}_{1}".format(param_i, val_i)
 
-        # replace the output file direction
-        script = re.sub(out_fn_mask, out_fn_base + script_i + out_fn_ext, script)
+        # add the filename to the list of parameters
+        out_fn = out_fn_mask.format(run_id)
+        these_params.append(out_fn)
 
-        # replace the function name
-        script = re.sub(func_mask, func_base + script_i, script)
+        # stringify the filename
+        params_string = ','.join([str(x) for x in these_params])
 
-        # write this new script to a file
-        with open(script_fn_base + script_i + script_ext, 'w') as f:
-            f.write(script)
+        # make the command
+        command = command_mask.format(params_string)
+        commands[command_cycler.next()].append(command)
 
     # write out the value map
-    write_dict("valmap_{0}.txt".format(param_i), val_map)
+    write_rows('valmap_{0}.txt'.format(param_i), val_list)
 
-    # reset the parameter to its base value
-    params[param] = base_val
+# write out the command files
+for submit_i, commands in commands.items():
+    submit_fn = submit_fn_mask.format(submit_i)
 
-# write out the param map
-write_dict("parammap.txt", param_map)
+    with open(submit_fn, 'w') as f:
+        f.write("\n".join(commands))

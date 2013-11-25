@@ -1,4 +1,13 @@
-function [] = __FUNCTION_NAME__()
+function [] = run(
+    __NITROGEN_RATIO__,
+    __CARBON_RATIO__,
+    __FIXED_OXYGEN_LEVEL__,
+    __FIXED_OXYGEN_DIFFUSION__,
+    __FIXED_CO2_LEVEL__,
+    __T_MAX__,
+    __FE_PRECIPITATION__,
+    __OUT__
+)
 
 %% Constants
 % These are constants that make assertions about the actual system
@@ -249,6 +258,6 @@ for x = 1: n_x
 end
 
 all_rates = [final_ma_op_rates final_tea_rates];
-csvwrite('__OUT__', all_rates);
+csvwrite(__OUT__, all_rates);
 
 end
