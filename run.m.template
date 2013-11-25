@@ -1,4 +1,4 @@
-function [t, y, final_flux, final_ma_op_rates, final_tea_rates] = run()
+function [] = __FUNCTION_NAME__()
 
 %% Constants
 % These are constants that make assertions about the actual system
@@ -247,5 +247,8 @@ final_tea_rates = zeros(n_x, n_po_teas);
 for x = 1: n_x
     [final_ma_op_rates(x, :), final_tea_rates(x, :)] = rates(squeeze(y(end, x, :))');
 end
+
+all_rates = [final_ma_op_rates final_tea_rates];
+csvwrite('__OUT__', all_rates);
 
 end
