@@ -43,7 +43,7 @@ slopes = lambda x, ys: [slope(x, y) for y in ys]
 with open('rate_names.txt', 'r') as f:
     rate_names = [l.strip() for l in f.readlines()]
 
-# read in the parameters
+# read in the parameter names
 params = []
 with open('base_params.txt', 'r') as f:
     r = csv.reader(f)
@@ -78,14 +78,17 @@ for param_i, param_name in enumerate(params):
     # do the linear regressions
     for rate_i, rate_name in enumerate(rate_names):
         for metric_i in [0, 1, 2]:
-            my_slope = slope(param_vals, single_values[rate_i, :, metric_i])
+            #swo> here's where you pick whether to make the x values based on the actual
+            # values of the parameter or just based on the percentage positions
+            #my_slope = slope(param_vals, single_values[rate_i, :, metric_i])
+            my_slope = slope(range(len(param_vals)), single_values[rate_i, :, metric_i])
             out_row.append(my_slope)
             print 'p={} r={} m={} slope={}'.format(param_name, rate_name, metric_i, my_slope)
 
     out_rows.append(out_row)
 
 # construct the output
-with open('out', 'w') as f:
+with open('out.csv', 'w') as f:
     w = csv.writer(f)
 
     header = ['rate'] + ['{0}_{1}'.format(rate_name, pos_name) for rate_name in rate_names for pos_name in ['LHM', 'max', 'UHM']]
