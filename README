@@ -1,0 +1,29 @@
+README
+this file
+
+__init__.py
+some junk python code
+
+base_params.txt
+a list of the base values of each of the parameters to be tested
+
+clean.sh
+a script to clean up some temporary files from previous runs
+
+lake_sens.py
+python script that produces base_params, valmap's, and submit's
+
+run.m
+the matlab code, different from previous iterations
+
+sensitivity_analysis.komodoproject
+from my Komodo IDE
+
+species_map.m
+part of the matlab code
+
+submit_0.sh
+a list of all the commands that need to be run
+
+valmap_0.txt, etc.
+lists of how the names of the output files map to the parameters used
