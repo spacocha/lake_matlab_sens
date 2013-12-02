@@ -1,25 +1,16 @@
-function [] = run(
-    __NITROGEN_RATIO__,
-    __CARBON_RATIO__,
-    __FIXED_OXYGEN_LEVEL__,
-    __FIXED_OXYGEN_DIFFUSION__,
-    __FIXED_CO2_LEVEL__,
-    __T_MAX__,
-    __FE_PRECIPITATION__,
-    __OUT__
-)
+function [] = run(NITROGEN_RATIO, CARBON_RATIO, FIXED_OXYGEN_LEVEL, FIXED_OXYGEN_DIFFUSION, FIXED_CO2_LEVEL, T_MAX, FE_PRECIPITATION, OUT)
 
 %% Constants
 % These are constants that make assertions about the actual system
 
-nitrogen_ratio = __NITROGEN_RATIO__;  % N- released per C degraded, 0.15 from Redfield
-carbon_ratio = __CARBON_RATIO__; % C dumped per O dumped
+nitrogen_ratio = NITROGEN_RATIO;  % N- released per C degraded, 0.15 from Redfield
+carbon_ratio = CARBON_RATIO; % C dumped per O dumped
 
 diffusion_constant_per_compartment2 = 0.75; % input diffusion constant
-fixed_oxygen_level = __FIXED_OXYGEN_LEVEL__;  % oxygen level at thermocline
-fixed_oxygen_diffusion = __FIXED_OXYGEN_DIFFUSION__;   % diffusion from oxygen above the thermocline
+fixed_oxygen_level = FIXED_OXYGEN_LEVEL;  % oxygen level at thermocline
+fixed_oxygen_diffusion = FIXED_OXYGEN_DIFFUSION;   % diffusion from oxygen above the thermocline
 
-fixed_co2_level = __FIXED_CO2_LEVEL__;  % CO2 level at thermocline
+fixed_co2_level = FIXED_CO2_LEVEL;  % CO2 level at thermocline
 fixed_co2_diffusion = fixed_oxygen_diffusion;
 
 fixed_methane_level = 0.0;
@@ -30,7 +21,7 @@ fixed_methane_diffusion = fixed_oxygen_diffusion;
 % assertions about the actual system.
 
 n_x = 17;   % number of compartments
-t_max = __T_MAX__;   % time until end of simulation (yrs)
+t_max = T_MAX;   % time until end of simulation (yrs)
 
 % compute the diffusion constant, which is dependent on the length scale,
 % which depends on the square of the number of compartments
@@ -49,7 +40,7 @@ diffusion_constant = diffusion_constant_per_compartment2 * n_x ^ 2;
 precipitation_constant_input = [
     s('N-'), 0.0
     s('S-'), 0.0
-    s('Fe+'), __FE_PRECIPITATION__
+    s('Fe+'), FE_PRECIPITATION
     s('C'), 0.0
     s('CO2'), 0.0
 ];
@@ -258,6 +249,6 @@ for x = 1: n_x
 end
 
 all_rates = [final_ma_op_rates final_tea_rates];
-csvwrite(__OUT__, all_rates);
+csvwrite(OUT, all_rates);
 
 end

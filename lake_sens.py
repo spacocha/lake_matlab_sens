@@ -2,9 +2,9 @@
 
 import numpy as np, re, csv, itertools
 
-command_mask = 'matlab -nojvm -r run({}); exit;'
+command_mask = 'matlab -nojvm -r "run({}); exit;"'
 
-n_submits = 5
+n_submits = 1
 
 submit_fn_mask = 'submit_{0}.sh'
 
@@ -23,7 +23,7 @@ base_params = [
     ['__FE_PRECIPITATION__', 0.1],
 ]
 
-out_fn_mask = '"rates_{}.csv"'
+out_fn_mask = '\'rates_{}.csv\''
 out_fn_base = 'rates_'
 out_fn_ext = '.csv'
 
