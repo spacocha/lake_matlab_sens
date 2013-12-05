@@ -20,7 +20,7 @@ for param_i, (param_name, base_val) in enumerate(base_params):
     # when modulating this parameter, multiply by some multiplier
     val_list = []
     for val_i, multiplier in enumerate(multipliers):
-        these_params = [base_val for param_name, base_val in base_params]
+        these_params = [float(base_val) for param_name, base_val in base_params]
         this_val = these_params[param_i] * multiplier
         these_params[param_i] = this_val
 
