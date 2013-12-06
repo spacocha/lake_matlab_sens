@@ -1,9 +1,0 @@
-iron_oxidation_(oxygen)
-ammonia_oxidation
-sulfur_oxidation
-iron_oxidation_(nitrate)
-aerobic_heterotrophy
-nitrate_reduction
-iron_reduction
-sulfur_reduction
-methanogenesis

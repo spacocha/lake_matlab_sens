@@ -26,10 +26,8 @@ for param_i, (param_name, base_val) in enumerate(base_params):
 
         val_list.append([val_i, this_val])
 
-        run_id = "{0}_{1}".format(param_i, val_i)
-
         # add the filename to the list of parameters
-        out_fn = conf.get('Scripting', 'out_fn_mask').format(run_id)
+        out_fn = conf.get('Scripting', 'matlab_data_fn_mask').format(param_i, val_i)
         these_params.append(out_fn)
 
         # stringify the filename

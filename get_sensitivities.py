@@ -6,7 +6,7 @@ the sensitivity of different positions for each rate curve to each
 of the modified parameters
 '''
 
-import csv
+import csv, ConfigParser
 import numpy as np
 import scipy.interpolate, scipy.stats
 
@@ -40,15 +40,12 @@ slope = lambda x, y: scipy.stats.linregress(x, y)[0]
 slopes = lambda x, ys: [slope(x, y) for y in ys]
 
 # read in the rate names
-with open('rate_names.txt', 'r') as f:
-    rate_names = [l.strip() for l in f.readlines()]
+conf = ConfigParser.ConfigParser()
+conf.read('sens.cfg')
+rate_names = [name for index, name in sorted(conf.items('Rate names'))]
 
 # read in the parameter names
-params = []
-with open('base_params.txt', 'r') as f:
-    r = csv.reader(f)
-    for i, param, base_val in r:
-        params.append(param)
+params = [param for param, base_val in conf.items('Simulation')]
 
 # loop over parameters
 out_rows = []
@@ -56,7 +53,7 @@ for param_i, param_name in enumerate(params):
     out_row = []
 
     # get values of the parameter
-    fn = 'valmap_{0}.txt'.format(param_i)
+    fn = conf.get('Scripting', 'valmap_mask').format(param_i)
     with open(fn, 'r') as f:
         r = csv.reader(f)
         param_vals = np.array([row[1] for row in r], dtype=float)
@@ -66,7 +63,7 @@ for param_i, param_name in enumerate(params):
     single_values = np.empty((len(rate_names), len(param_vals), 3))
     for val_i, param_val in enumerate(param_vals):
         # get the data
-        fn = 'data/rates_{0}_{1}.csv'.format(param_i, val_i)
+        fn = conf.get('Scripting', 'analysis_data_fn_mask').format(param_i, val_i)
         dat = np.genfromtxt(fn, delimiter=',')
         x = range(dat.shape[0])
 
