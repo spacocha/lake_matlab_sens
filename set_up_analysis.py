@@ -47,4 +47,16 @@ for submit_i, commands in commands.items():
     submit_fn = conf.get('Scripting', 'submit_fn_mask').format(submit_i)
 
     with open(submit_fn, 'w') as f:
+        string = """#!/bin/csh 
+# o Export all my environment variables to the job
+#PBS -V
+
+if ( -f /etc/profile.d/modules.csh ) then
+    source /etc/profile.d/modules.csh
+endif
+
+module load matlab
+"""
+
+        f.write(string)
         f.write("\n".join(commands))
