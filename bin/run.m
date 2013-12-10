@@ -1,4 +1,4 @@
-function [] = run(NITROGEN_RATIO, CARBON_RATIO, FIXED_OXYGEN_LEVEL, FIXED_OXYGEN_DIFFUSION, FIXED_CO2_LEVEL, T_MAX, FE_PRECIPITATION, DIFF_CONST_COMP, MA_OP_O_FE_RATE_CONST, MA_OP_O_N_RATE_CONST, MA_OP_O_S_RATE_CONST, MA_OP_FE_N_RATE_CONST, PRIMARY_OX_RATE_CONST, C_LIM_O, C_LIM_N, C_LIM_FE, C_LIM_S, C_LIM_CO2, CONCS0_C, CONCS0_O, CONCS0_NPLUS, CONCS0_NMINUS, CONCS0_FEPLUS, CONCS0_FEMINUS, CONCS0_SPLUS, CONCS0_SMINUS, OUT)
+function [] = run(NITROGEN_RATIO, CARBON_RATIO, FIXED_OXYGEN_LEVEL, FIXED_OXYGEN_DIFFUSION, FIXED_CO2_LEVEL, T_MAX, FE_PRECIPITATION, DIFF_CONST_COMP, MA_OP_O_FE_RATE_CONST, MA_OP_O_N_RATE_CONST, MA_OP_O_S_RATE_CONST, MA_OP_FE_N_RATE_CONST, PRIMARY_OX_RATE_CONST, C_LIM_O, C_LIM_N, C_LIM_FE, C_LIM_S, C_LIM_CO2, CONCS0_C, CONCS0_O, CONCS0_NTOT, PM_RATIO_N, CONCS0_FETOT, PM_RATIO_FE, CONCS0_STOT, PM_RATIO_S, OUT)
 
 %% Constants
 % These are constants that make assertions about the actual system
@@ -83,15 +83,25 @@ po_teas = [
 % initialize the lake, asserting flat profiles for each metabolite
 % metabolites not mentioned have concentration 0
 concs0 = zeros(n_x, n_species);
+
 concs0(:, s('C')) = CONCS0_C;
 concs0(:, s('O')) = CONCS0_O;
 
+%Start with an initial conc of N (CONCS0_NTOT) and a ratio of plus to minus PM_RATIO_N
+CONCS0_NPLUS = CONCS0_NTOT/(1 + (1/PM_RATIO_N));
+CONCS0_NMINUS = CONCS0_NTOT/(PM_RATIO_N + 1);
 concs0(:, s('N+')) = CONCS0_NPLUS;
 concs0(:, s('N-')) = CONCS0_NMINUS;
 
+%Start with an initial conc of FE (CONCS0_FETOT) and a ratio of plus to minus PM_RATIO_FE
+CONCS0_FEPLUS = CONCS0_FETOT/(1 + (1/PM_RATIO_FE));
+CONCS0_FEMINUS = CONCS0_FETOT/(PM_RATIO_FE + 1);
 concs0(:, s('Fe+')) = CONCS0_FEPLUS;
 concs0(:, s('Fe-')) = CONCS0_FEMINUS;
 
+%Start with an initial conc of S (CONCS0_STOT) and a ratio of plus to minus PM_RATIO_S
+CONCS0_SPLUS = CONCS0_STOT/(1 + (1/PM_RATIO_S));
+CONCS0_SMINUS = CONCS0_STOT/(PM_RATIO_S + 1);
 concs0(:, s('S+')) = CONCS0_SPLUS;
 concs0(:, s('S-')) = CONCS0_SMINUS;
 
